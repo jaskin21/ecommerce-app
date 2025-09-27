@@ -28,6 +28,7 @@ const RegisterPage = lazy(() =>
   delayImport(() => import('./pages/RegisterPage'))
 );
 const ShopPage = lazy(() => delayImport(() => import('./pages/ShopPage')));
+const CartPage = lazy(() => delayImport(() => import('./pages/CartPage')));
 const GiftCardPage = lazy(() =>
   delayImport(() => import('./pages/GiftCardPage'))
 );
@@ -53,6 +54,7 @@ export default function App() {
               <Route path='/about' element={<About />} />
               <Route path='/contact' element={<Contact />} />
               <Route path='/shop' element={<ShopPage />} />
+              <Route path='/cart' element={<CartPage />} />
             </Route>
             <Route path='*' element={<NotFoundPage />} />
             <Route path='/login' element={<LoginPage />} />

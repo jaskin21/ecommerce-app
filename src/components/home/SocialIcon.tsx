@@ -1,8 +1,18 @@
-import { FaInstagram, FaFacebookF, FaPinterestP } from 'react-icons/fa';
+import { motion } from "framer-motion";
+import { FaInstagram, FaFacebookF, FaPinterestP } from "react-icons/fa";
+import { useCart } from "../../context/CartContext";
 
 const SocialIcons = () => {
+  const { isOpen } = useCart();
+
   return (
-    <div className='hidden md:flex fixed right-4 top-1/3 flex-col space-y-4 z-50'>
+    <motion.div
+      animate={{
+        right: isOpen ? (window.innerWidth >= 1024 ? 520 : 420) : 16,
+      }}
+      transition={{ type: 'tween' }}
+      className='hidden md:flex fixed top-1/3 flex-col space-y-4 z-30'
+    >
       <a
         href='https://instagram.com'
         target='_blank'
@@ -27,7 +37,7 @@ const SocialIcons = () => {
       >
         <FaPinterestP className='text-white text-xl' />
       </a>
-    </div>
+    </motion.div>
   );
 };
 

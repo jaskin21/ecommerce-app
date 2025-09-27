@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
 export default function HeaderCart() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen } = useCart();
   const navigate = useNavigate();
 
   // Dummy cart items
@@ -20,6 +20,34 @@ export default function HeaderCart() {
     },
     {
       id: 2,
+      name: 'Modern Lamp',
+      price: 75,
+      qty: 1,
+      image: '/images/about-banner.jpg',
+    },
+    {
+      id: 3,
+      name: 'Modern Lamp',
+      price: 75,
+      qty: 1,
+      image: '/images/about-banner.jpg',
+    },
+    {
+      id: 4,
+      name: 'Modern Lamp',
+      price: 75,
+      qty: 1,
+      image: '/images/about-banner.jpg',
+    },
+    {
+      id: 5,
+      name: 'Modern Lamp',
+      price: 75,
+      qty: 1,
+      image: '/images/about-banner.jpg',
+    },
+    {
+      id: 6,
       name: 'Modern Lamp',
       price: 75,
       qty: 1,
@@ -120,7 +148,13 @@ export default function HeaderCart() {
                   >
                     View Cart
                   </button>
-                  <button className='w-full sm:flex-1 bg-black text-white py-2 rounded-lg hover:bg-gray-800 text-sm sm:text-base'>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      navigate('/checkout');
+                    }}
+                    className='w-full sm:flex-1 bg-black text-white py-2 rounded-lg hover:bg-gray-800 text-sm sm:text-base'
+                  >
                     Checkout
                   </button>
                 </div>

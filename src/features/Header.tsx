@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { User, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HeaderCart from './ui/HeaderCart';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
 
-  // const location = useLocation();
-
-  // const isActive = (path: string) =>
-  //   location.pathname === path
-  //     ? 'block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white'
-  //     : 'block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700';
+  const isActive = (path: string) =>
+    location.pathname === path
+      ? 'opacity-50 cursor-default' // 👈 active style
+      : 'hover:text-black transition';
 
   return (
     <header className='border-b shadow-sm pt-2 pb-4 sticky top-0 bg-white z-40'>
@@ -28,27 +27,27 @@ const Header = () => {
           {/* --- NAV LINKS (desktop only ≥1024px) --- */}
           <ul className='hidden lg:flex gap-8 text-gray-700 font-medium'>
             <li>
-              <Link to='/shop' className='hover:text-black transition'>
+              <Link to='/shop' className={isActive('/shop')}>
                 Shop
               </Link>
             </li>
             <li>
-              <Link to='/about' className='hover:text-black transition'>
+              <Link to='/about' className={isActive('/about')}>
                 About
               </Link>
             </li>
             <li>
-              <Link to='/faq' className='hover:text-black transition'>
+              <Link to='/faq' className={isActive('/faq')}>
                 FAQ
               </Link>
             </li>
             <li>
-              <Link to='/gift-card' className='hover:text-black transition'>
+              <Link to='/gift-card' className={isActive('/gift-card')}>
                 Gift Card
               </Link>
             </li>
             <li>
-              <Link to='/contact' className='hover:text-black transition'>
+              <Link to='/contact' className={isActive('/contact')}>
                 Contact
               </Link>
             </li>
@@ -88,7 +87,7 @@ const Header = () => {
             </Link>
 
             {/* Cart always visible */}
-            <HeaderCart />
+            {location.pathname !== '/cart' && <HeaderCart />}
 
             {/* Burger menu toggle: visible when <lg (so tablet & mobile) */}
             <button
@@ -145,19 +144,43 @@ const Header = () => {
               </div>
 
               {/* Nav links */}
-              <Link to='/shop' onClick={() => setMenuOpen(false)}>
+              <Link
+                to='/shop'
+                onClick={() => setMenuOpen(false)}
+                className={isActive('/shop')}
+              >
                 Shop
               </Link>
-              <Link to='/about' onClick={() => setMenuOpen(false)}>
+
+              <Link
+                to='/about'
+                onClick={() => setMenuOpen(false)}
+                className={isActive('/about')}
+              >
                 About
               </Link>
-              <Link to='/faq' onClick={() => setMenuOpen(false)}>
+
+              <Link
+                to='/faq'
+                onClick={() => setMenuOpen(false)}
+                className={isActive('/faq')}
+              >
                 FAQ
               </Link>
-              <Link to='/gift-card' onClick={() => setMenuOpen(false)}>
+
+              <Link
+                to='/gift-card'
+                onClick={() => setMenuOpen(false)}
+                className={isActive('/gift-card')}
+              >
                 Gift Card
               </Link>
-              <Link to='/contact' onClick={() => setMenuOpen(false)}>
+
+              <Link
+                to='/contact'
+                onClick={() => setMenuOpen(false)}
+                className={isActive('/contact')}
+              >
                 Contact
               </Link>
             </motion.div>
