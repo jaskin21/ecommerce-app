@@ -16,14 +16,14 @@ export default function HeaderCart() {
       name: 'Comfy Chair',
       price: 120,
       qty: 2,
-      image: 'https://via.placeholder.com/80',
+      image: '/images/contact-us.jpg',
     },
     {
       id: 2,
       name: 'Modern Lamp',
       price: 75,
       qty: 1,
-      image: 'https://via.placeholder.com/80',
+      image: '/images/about-banner.jpg',
     },
   ];
 
