@@ -10,8 +10,7 @@ import { store } from './stores/store';
 import Layout from './features/layout/Layout';
 import Loading from './pages/Loading';
 
-// Utility to delay lazy loading (for testing/demo purposes)
-const delayImport = <T extends { default: React.ComponentType<any> }>(
+const delayImport = <P, T extends { default: React.ComponentType<P> }>(
   importFunc: () => Promise<T>,
   delay: number = 1000
 ): Promise<T> =>
@@ -23,9 +22,16 @@ const delayImport = <T extends { default: React.ComponentType<any> }>(
 
 // Lazy-loaded pages
 const HomePage = lazy(() => delayImport(() => import('./pages/HomePage')));
-const NotFoundPage = lazy(() =>
-  delayImport(() => import('./pages/NotFoundPage'))
-);
+const FAQPage = lazy(() => delayImport(() => import('./pages/FAQPage')));
+const ShopPage = lazy(() => delayImport(() => import('./pages/ShopPage')));
+const GiftCardPage = lazy(() => delayImport(() => import('./pages/GiftCardPage')));
+const About = lazy(() => delayImport(() => import('./pages/AboutPage')));
+const Contact = lazy(() => delayImport(() => import('./pages/ContactPage')));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+// const NotFoundPage = lazy(() =>
+//   delayImport(() => import('./pages/NotFoundPage'))
+// );
 
 export default function App() {
   return (
@@ -36,6 +42,11 @@ export default function App() {
           <Routes>
             <Route path='/' element={<Layout />}>
               <Route index element={<HomePage />} />
+              <Route path='/faq' element={<FAQPage />} />
+              <Route path='/gift-card' element={<GiftCardPage />} />
+              <Route path='/about' element={<About />} />
+              <Route path='/contact' element={<Contact />} />
+              <Route path='/shop' element={<ShopPage />} />
             </Route>
             <Route path='*' element={<NotFoundPage />} />
           </Routes>

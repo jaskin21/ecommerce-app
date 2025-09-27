@@ -1,317 +1,215 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../components/ui/table';
-import {
-  useGetExpensesQuery,
-  useDeleteExpenseMutation,
-} from '../stores/apiSlice';
-import { Expense } from '../types/apiSlice';
+import { motion } from 'framer-motion';
+import ProductList from '../components/home/ProductList';
+import { FaStar } from 'react-icons/fa';
 import { useState } from 'react';
-import { Plus, List, Trash2, Loader2 } from 'lucide-react';
-import DeleteConfirmationModal from '../components/hook/DeleteConfirmationModal';
-import useDeleteConfirmation from '../hook/useConfirmationDelete';
-import { handleFetchBaseQueryError } from '../utils/errorFactory';
-import useToast from '../hook/useToast';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import ExpenseInfoDialog from '../components/home/ExpenseInfoDialog';
-import ExpenseFormDialog from '../components/home/ExpenseFormDialog';
-import SummaryDrawer from '../components/home/SummaryDrawer';
-import { format } from 'date-fns';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
 
-export default function ExpensesTable() {
-  const { showSuccessToast, showErrorToast } = useToast();
+const HomePage = () => {
+  const testimonials = [
+    { text: '“A new industry standard.” - Entrepreneur' },
+    { text: "“Just what your OB-GYN ordered.” - Harper's Bazaar" },
+    { text: "“We're obsessed” - Glamour" },
+    { text: '“My favorite underwear ... ever” - Vogue' },
+  ];
 
-  const [search, setSearch] = useState('');
-  const { data, isLoading, isError, refetch } = useGetExpensesQuery(
-    search ? { search } : undefined
-  );
-  const expenses: Expense[] = data?.data || [];
+  const customerReviews = [
+    {
+      review:
+        "The softest, most breathable essentials I've ever worn—comfortable all day long!",
+      name: 'Rebecca B.',
+      status: 'Verified Customer',
+      product: 'Organic Cotton High-Rise Thong',
+      productLink: '#',
+    },
+    {
+      review:
+        'These are so much more comfortable and durable compared to other brands. Feels like you are wearing nothing.',
+      name: 'Allison G.',
+      status: 'Verified Customer',
+      product: 'Organic Cotton Low-Rise Thong',
+      productLink: '#',
+    },
+    {
+      review:
+        'Worth every penny! I love my JAS essentials — the mid-rise thong, bikini, and hipster. They stay put all day.',
+      name: 'Jennifer D.',
+      status: 'Verified Customer',
+      product: 'Organic Cotton Mid-Rise Bikini',
+      productLink: '#',
+    },
+    {
+      review:
+        'Super comfy and sustainable! I’ve switched all my basics to JAS Ecommerce.',
+      name: 'Michael T.',
+      status: 'Verified Customer',
+      product: 'Organic Cotton Crew Tee',
+      productLink: '#',
+    },
+    {
+      review:
+        'I was skeptical at first, but these are the only essentials I wear now. They last forever!',
+      name: 'Sophia R.',
+      status: 'Verified Customer',
+      product: 'Organic Cotton Bodysuit',
+      productLink: '#',
+    },
+    {
+      review:
+        "Quality is unmatched, and I love that it's eco-friendly. Highly recommend.",
+      name: 'David P.',
+      status: 'Verified Customer',
+      product: 'Organic Cotton Hoodie',
+      productLink: '#',
+    },
+  ];
 
-  // dialog state
-  const [infoExpense, setInfoExpense] = useState<Expense | null>(null);
-  const [formExpense, setFormExpense] = useState<Expense | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [openSummary, setOpenSummary] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const reviewsPerSlide = 3; // Show 3 at a time
+  const totalSlides = Math.ceil(customerReviews.length / reviewsPerSlide);
 
-  // delete confirmation
-  const {
-    isModalOpen: isDeleteModalOpen,
-    openModal: openDeleteModal,
-    closeModal: closeDeleteModal,
-    confirmDelete,
-    setConfirmCallback: setDeleteConfirmCallback,
-  } = useDeleteConfirmation();
-  const [deleteExpense] = useDeleteExpenseMutation();
-
-  // bulk delete
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const allChecked =
-    expenses.length > 0 && selectedIds.length === expenses.length;
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const toggleCheck = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+  const prevSlide = () => {
+    setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
   };
 
-  const toggleCheckAll = () => {
-    setSelectedIds(allChecked ? [] : expenses.map((e) => e.id));
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedIds.length === 0) return;
-    setIsDeleting(true);
-    try {
-      setDeleteConfirmCallback(async () => {
-        await Promise.all(selectedIds.map((id) => deleteExpense(id).unwrap()));
-        showSuccessToast(`Deleted ${selectedIds.length} items successfully!`);
-        setSelectedIds([]);
-        await refetch();
-      });
-      openDeleteModal();
-    } catch (error) {
-      const errorMessage = handleFetchBaseQueryError(
-        error as FetchBaseQueryError,
-        'Invalid request!',
-        true
-      );
-      showErrorToast(`${errorMessage}`);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleDeleteSingle = (id: string) => {
-    if (!id) return;
-    setDeleteConfirmCallback(async () => {
-      setIsDeleting(true);
-      try {
-        await deleteExpense(id).unwrap();
-         showSuccessToast(`Item deleted successfully!`);
-        await refetch();
-        setInfoExpense(null);
-      } catch (error) {
-        const errorMessage = handleFetchBaseQueryError(
-          error as FetchBaseQueryError,
-          'Invalid request!',
-          true
-        );
-        showErrorToast(`${errorMessage}`);
-      } finally {
-        setIsDeleting(false);
-      }
-    });
-    openDeleteModal();
+  const nextSlide = () => {
+    setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
   };
 
   return (
-    <div className='max-w-screen-xl mx-auto px-6 relative'>
-      <div className='bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden'>
-        {/* Header */}
-        <div className='px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4'>
-          <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-100'>
-            Expense Records
-          </h2>
-
-          <div className='flex-1 flex justify-center'>
-            <input
-              type='text'
-              placeholder='Search expenses...'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              disabled={isDeleting}
-              data-testid='search-bar'
-              className='w-full max-w-xs px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 disabled:opacity-50'
-            />
-          </div>
-
-          <div className='flex items-center gap-4'>
-            <button
-              onClick={handleBulkDelete}
-              disabled={isDeleting || selectedIds.length === 0}
-              data-testid='bulk-delete'
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md bg-red-600 text-white text-sm hover:bg-red-700 disabled:opacity-50 transition-all
-                ${selectedIds.length === 0 ? 'invisible' : 'visible'}`}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className='w-4 h-4 animate-spin' />
-                  <span className='hidden sm:inline'>Deleting...</span>
-                </>
-              ) : (
-                <>
-                  <Trash2 className='w-4 h-4' />
-                  <span className='hidden sm:inline'>Delete Selected</span>
-                </>
-              )}
-            </button>
-            <span className='text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap'>
-              Total Records: {expenses.length}
-            </span>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className='overflow-x-auto'>
-          <Table className={isDeleting ? 'opacity-50 pointer-events-none' : ''}>
-            <TableHeader>
-              <TableRow className='bg-gray-100 dark:bg-gray-800'>
-                <TableHead className='px-4 py-4'>
-                  <input
-                    type='checkbox'
-                    checked={allChecked}
-                    onChange={toggleCheckAll}
-                    disabled={isDeleting}
-                  />
-                </TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead>Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading && (
-                <TableRow>
-                  <TableCell colSpan={5} className='text-center py-10'>
-                    Loading expenses...
-                  </TableCell>
-                </TableRow>
-              )}
-              {isError && (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className='text-center py-10 text-red-500'
-                  >
-                    Failed to load expenses.
-                  </TableCell>
-                </TableRow>
-              )}
-              {!isLoading &&
-                !isError &&
-                expenses.map((expense) => (
-                  <TableRow
-                    key={expense.id}
-                    data-testid={`expense-row-${expense.id}`}
-                    onClick={() => setInfoExpense(expense)}
-                    className='hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer'
-                  >
-                    <TableCell className='px-4 py-4'>
-                      <input
-                        type='checkbox'
-                        checked={selectedIds.includes(expense.id)}
-                        disabled={isDeleting}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={() => toggleCheck(expense.id)}
-                      />
-                    </TableCell>
-                    <TableCell>{expense.description}</TableCell>
-                    <TableCell>{expense.category}</TableCell>
-                    <TableCell>
-                      {format(new Date(expense.createdAt), 'MMMM d, yyyy')}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(expense.updatedAt), 'MMMM d, yyyy')}
-                    </TableCell>
-                    <TableCell>
-                      <TableCell>
-                        <TableCell>
-                          {expense.amount.toLocaleString('en-PH', {
-                            style: 'currency',
-                            currency: 'PHP',
-                          })}
-                        </TableCell>
-                      </TableCell>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {!isLoading && !isError && expenses.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className='text-center py-10'>
-                    No expenses found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Footer */}
-        <div className='px-6 py-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between relative'>
-          <span className='text-sm text-gray-500 dark:text-gray-400'>
-            Last updated:{' '}
-            {format(new Date(), 'MMMM d, yyyy @h:mm a')}
-          </span>
-          <div className='flex gap-3 absolute right-6 top-1/2 transform -translate-y-1/2'>
-            <button
-              disabled={isDeleting}
-              onClick={() => {
-                setFormExpense(null);
-                setIsFormOpen(true);
-              }}
-              data-testid='add-expense'
-              className={`w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 ${
-                isDeleting ? 'opacity-50 pointer-events-none' : ''
-              }`}
-            >
-              <Plus className='w-5 h-5' />
-            </button>
-            <button
-              disabled={isDeleting}
-              onClick={() => setOpenSummary(true)}
-              className={`w-10 h-10 flex items-center justify-center rounded-full bg-gray-600 text-white shadow-lg hover:bg-gray-700 ${
-                isDeleting ? 'opacity-50 pointer-events-none' : ''
-              }`}
-            >
-              <List className='w-5 h-5' />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Info Dialog */}
-      {infoExpense && (
-        <ExpenseInfoDialog
-          expense={infoExpense}
-          onClose={() => setInfoExpense(null)}
-          onEdit={() => {
-            setFormExpense(infoExpense);
-            setInfoExpense(null);
-            setIsFormOpen(true);
-          }}
-          onDelete={() => handleDeleteSingle(infoExpense.id)}
+    <>
+      {/* Full-Width Banner Image with Overlay Content */}
+      <section className='relative w-full'>
+        <img
+          src='/images/home-banner.jpg'
+          alt='About JAS Ecommerce'
+          className='w-full h-[30rem] md:h-[47rem] object-cover'
         />
-      )}
 
-      {/* Form Dialog */}
-      <ExpenseFormDialog
-        open={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        expense={formExpense}
-        onSaved={() => {
-          setIsFormOpen(false);
-          refetch();
-        }}
-      />
+        {/* Centered Overlay Box */}
+        <div className='absolute inset-0 flex items-center justify-center px-4'>
+          <div className='bg-white bg-opacity-70 px-4 py-6 md:px-8 md:py-10 text-center rounded-md shadow-lg w-full max-w-md md:max-w-xl'>
+            <h1 className='text-xl sm:text-2xl md:text-4xl font-thin mb-6'>
+              Timeless Style, Naturally Made
+            </h1>
 
-      {/* Delete Confirmation */}
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={() => confirmDelete()}
-        message='Are you sure you want to delete this item?'
-      />
+            <button className='bg-gradient-to-r from-blue-500 to-indigo-600/40 text-white px-6 py-2 md:px-8 md:py-3 rounded-md shadow hover:opacity-90 transition mb-4 text-sm md:text-base'>
+              SHOP SUSTAINABLE
+            </button>
 
-      {/* Drawer lives once at the root of the page */}
-      <SummaryDrawer open={openSummary} onOpenChange={setOpenSummary} />
-    </div>
+            <p className='text-gray-700 text-xs sm:text-sm md:text-base'>
+              15K+ Orders Shipped Sustainably • Zero Compromise
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Infinite Carousel */}
+      <section className='w-full py-6 overflow-hidden'>
+        <motion.div
+          className='flex whitespace-nowrap'
+          animate={{ x: ['0%', '-100%'] }}
+          transition={{
+            ease: 'linear',
+            duration: 25,
+            repeat: Infinity,
+          }}
+        >
+          {[...testimonials, ...testimonials].map((item, idx) => (
+            <span key={idx} className='mx-12 text-lg font-medium text-gray-700'>
+              {item.text}
+            </span>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* Product List Section */}
+      <ProductList />
+
+      {/* Testimonials Section */}
+      <section className='max-w-6xl mx-auto px-6 py-16 text-center relative'>
+        {/* Stars */}
+        <div className='flex justify-center mb-4 text-yellow-500'>
+          {[...Array(5)].map((_, i) => (
+            <FaStar key={i} className='mx-1' />
+          ))}
+        </div>
+
+        {/* Title */}
+        <h2 className='text-2xl md:text-3xl font-semibold mb-6'>
+          Over 15,000 5-Star Reviews
+        </h2>
+        <hr className='border-t border-gray-300 w-1/3 mx-auto mb-10' />
+
+        {/* Reviews Carousel */}
+        <div className='overflow-hidden'>
+          <div
+            className='flex transition-transform duration-500 ease-in-out'
+            style={{ transform: `translateX(-${current * 100}%)` }}
+          >
+            {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+              <div
+                key={slideIndex}
+                className='grid grid-cols-1 md:grid-cols-3 gap-8 min-w-full'
+              >
+                {customerReviews
+                  .slice(
+                    slideIndex * reviewsPerSlide,
+                    slideIndex * reviewsPerSlide + reviewsPerSlide
+                  )
+                  .map((review, index) => (
+                    <div key={index} className='p-6 '>
+                      <p className='italic text-gray-800 mb-4'>
+                        " {review.review} "
+                      </p>
+                      <p className='font-medium'>{review.name}</p>
+                      <p className='text-green-600 text-sm mb-2'>
+                        ✔ {review.status}
+                      </p>
+                      <p className='text-sm'>
+                        Reviewing:{' '}
+                        <a
+                          href={review.productLink}
+                          className='underline hover:text-blue-600'
+                        >
+                          {review.product}
+                        </a>
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Arrows */}
+        <button
+          onClick={prevSlide}
+          className='absolute top-1/2 left-2 transform -translate-y-1/2 bg-white shadow p-2 rounded-full hover:bg-gray-100'
+        >
+          <FaChevronLeft />
+        </button>
+        <button
+          onClick={nextSlide}
+          className='absolute top-1/2 right-2 transform -translate-y-1/2 bg-white shadow p-2 rounded-full hover:bg-gray-100'
+        >
+          <FaChevronRight />
+        </button>
+
+        {/* Circle Indicators */}
+        <div className='flex justify-center mt-6 space-x-2'>
+          {Array.from({ length: totalSlides }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`w-3 h-3 rounded-full ${
+                current === i ? 'bg-blue-600' : 'bg-gray-300'
+              }`}
+            ></button>
+          ))}
+        </div>
+      </section>
+    </>
   );
-}
+};
+
+export default HomePage;
