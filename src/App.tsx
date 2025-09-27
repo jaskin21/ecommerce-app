@@ -1,12 +1,10 @@
 // App.tsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
 import { Suspense, lazy } from 'react';
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { store } from './stores/store';
 import Layout from './features/layout/Layout';
 import Loading from './pages/Loading';
 
@@ -42,7 +40,6 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 export default function App() {
   return (
-    <Provider store={store}>
       <BrowserRouter>
         <ToastContainer />
         <Suspense fallback={<Loading />}>
@@ -62,6 +59,5 @@ export default function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
-    </Provider>
   );
 }

@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
-import ProductList from '../components/home/ProductList';
 import { FaStar } from 'react-icons/fa';
 import { useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
+import DiscountedItemCarousel from '../components/home/DiscountedItemCarousel';
+import PopularProduct from '../components/home/PopularProduct';
+import DiscountCountdown from '../components/home/DiscountCountdown';
 
 const HomePage = () => {
   const testimonials = [
@@ -123,7 +125,13 @@ const HomePage = () => {
       </section>
 
       {/* Product List Section */}
-      <ProductList />
+      <DiscountedItemCarousel />
+
+      {/* Countdown Timer Section */}
+      <DiscountCountdown />
+      
+      {/* Popular Products Section */}
+      <PopularProduct />
 
       {/* Testimonials Section */}
       <section className='max-w-6xl mx-auto px-6 py-16 text-center relative'>

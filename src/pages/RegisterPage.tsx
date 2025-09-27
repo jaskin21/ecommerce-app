@@ -39,12 +39,10 @@ export default function Register() {
 
         {/* Overlay with centered text */}
         <div className='relative z-10 flex flex-col items-center justify-center flex-grow p-8 text-center text-white'>
-          <h1 className='text-4xl font-bold mb-4'>
-            Join JAS Aesthetic
-          </h1>
+          <h1 className='text-4xl font-bold mb-4'>Join Aesthetic Hub! 🎉</h1>
           <p className='max-w-sm text-lg'>
-            Get started today and simplify your workflow with our powerful
-            tools.
+            Start your online shopping journey today — hassle-free, with fast
+            delivery and reliable service you can trust.
           </p>
         </div>
       </div>

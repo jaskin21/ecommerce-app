@@ -1,14 +1,16 @@
-import { FaStar } from 'react-icons/fa';
-import { BsCartPlus } from 'react-icons/bs';
-import { AiOutlineHeart, AiOutlineEye } from 'react-icons/ai';
+import { AiOutlineEye, AiOutlineHeart } from 'react-icons/ai';
 import { useShopStore } from '../../stores/useProductStore';
+import { BsCartPlus } from 'react-icons/bs';
 import useToast from '../../hook/useToast';
 import { handleFetchBaseQueryError } from '../../utils/errorFactory';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { FaStar } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 
-export default function ProductList() {
-  const { products, addToCart } = useShopStore();
+const PopularProduct = () => {
+  const { popularItems, addToCart } = useShopStore();
   const { showSuccessToast, showErrorToast } = useToast();
+   const navigate = useNavigate();
 
   const handleAddToCart = (id: number) => {
     try {
@@ -29,12 +31,12 @@ export default function ProductList() {
     <div className='flex flex-wrap gap-6 max-w-7xl mx-auto px-6 pt-6 pb-12'>
       {/* Breadcrumb */}
       {/* <nav className='text-sm text-gray-500 mb-6'>
-        <span className='cursor-pointer hover:underline'>Home</span> &gt;{' '}
-        <span className='cursor-pointer hover:underline'>Products</span> &gt;{' '}
-        <span className='font-medium text-gray-800'>Electronics</span>
-      </nav> */}
+            <span className='cursor-pointer hover:underline'>Home</span> &gt;{' '}
+            <span className='cursor-pointer hover:underline'>Products</span> &gt;{' '}
+            <span className='font-medium text-gray-800'>Electronics</span>
+          </nav> */}
 
-      {products.map((product) => (
+      {popularItems.map((product) => (
         <div
           key={product.id}
           className='flex flex-col flex-1 min-w-[250px] max-w-sm border rounded-lg p-4 hover:shadow-lg transition bg-white'
@@ -85,7 +87,7 @@ export default function ProductList() {
 
             {/* Price + Actions */}
             <div className='flex justify-between items-center'>
-              <span className='text-lg font-bold'>${product.price}</span>
+              <span className='text-xl font-bold'>${product.price}</span>
               <button
                 onClick={() => handleAddToCart(product.id)}
                 className='flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition'
@@ -100,10 +102,15 @@ export default function ProductList() {
 
       {/* Show more button */}
       <div className='w-full flex justify-center mt-8'>
-        <button className='px-6 py-2 border rounded hover:bg-gray-100 transition'>
+        <button
+          className='px-6 py-2 border rounded hover:bg-gray-100 transition'
+          onClick={() => navigate('/shop')}
+        >
           Show more
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default PopularProduct;

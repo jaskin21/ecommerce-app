@@ -29,10 +29,10 @@ export default function Login() {
 
         {/* Overlay with centered text */}
         <div className='relative z-10 flex flex-col items-center justify-center flex-grow p-8 text-center text-white'>
-          <h1 className='text-4xl font-bold mb-4'>Hello SaleSkip! 👋</h1>
+          <h1 className='text-4xl font-bold mb-4'>Hello Jas! 👋</h1>
           <p className='max-w-sm text-lg'>
-            Skip repetitive and manual sales-marketing tasks. Get highly
-            productive through automation and save tons of time!
+            Say goodbye to repetitive, manual purchases and enjoy a smarter,
+            more seamless shopping experience.
           </p>
         </div>
       </div>
