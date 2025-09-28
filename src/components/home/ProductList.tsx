@@ -7,8 +7,10 @@ import { useShopStore } from '../../stores/useProductStore';
 import useToast from '../../hook/useToast';
 import { handleFetchBaseQueryError } from '../../utils/errorFactory';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductList() {
+  const navigate = useNavigate();
   const { products, addToCart, discountedItems } = useShopStore();
   const { showSuccessToast, showErrorToast } = useToast();
 
@@ -131,7 +133,7 @@ export default function ProductList() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.25 }}
                   whileHover={{ scale: 1.02 }}
-                  className={`relative border rounded-lg p-4 bg-white shadow cursor-pointer transition-colors ${
+                  className={`relative border rounded-lg p-4 bg-white shadow transition-colors ${
                     effectiveView === 'list'
                       ? 'flex flex-row gap-4 items-start'
                       : 'flex flex-col'
@@ -166,7 +168,10 @@ export default function ProductList() {
                       )}
                     </div>
 
-                    <h3 className='font-medium text-gray-800 mb-2 line-clamp-2'>
+                    <h3
+                      onClick={() => navigate(`/shop/${product.id}`)}
+                      className='font-medium text-gray-800 mb-2 line-clamp-2 cursor-pointer hover:underline'
+                    >
                       {product.title}
                     </h3>
 
