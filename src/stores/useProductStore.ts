@@ -12,8 +12,8 @@ export type Product = {
     rate: number;
     count: number;
   };
-  discount?: string; // human readable label ("Up to 35% off")
-  discountPercent?: number; // actual percent (0.35, 0.15, etc.)
+  discount?: string;
+  discountPercent?: number;
 };
 
 export type CartEntry = {
@@ -27,7 +27,16 @@ export type CartDetail = {
   subtotal: number;
 };
 
+interface FilterOptions {
+  search?: string;
+  categories?: string[];
+  minRating?: number; // e.g. 4 means >= 4 stars
+  priceRange?: [number, number]; // [min, max]
+  onlyDiscounted?: boolean;
+}
+
 interface ShopState {
+  originalProducts: Product[];
   products: Product[];
   discountedItems: Product[];
   popularItems: Product[];
@@ -40,12 +49,15 @@ interface ShopState {
   updateCount: (productId: number, count: number) => void;
   clearCart: () => void;
 
+  // filters
+  filterProducts: (filters?: FilterOptions) => void;
+  resetFilters: () => void;
+
   // readers
   getCartDetails: () => CartDetail[];
   totalAmount: () => number;
   totalCount: () => number;
 
-  // 🆕 summary reader
   getSummary: () => {
     originalPrice: number;
     savings: number;
@@ -56,6 +68,7 @@ interface ShopState {
 }
 
 export const useShopStore = create<ShopState>((set, get) => ({
+  originalProducts: [],
   products: [],
   discountedItems: [],
   popularItems: [],
@@ -110,7 +123,8 @@ export const useShopStore = create<ShopState>((set, get) => ({
       }));
 
       set({
-        products: productsCopy,
+        originalProducts: productsCopy,
+        products: [...productsCopy],
         discountedItems,
         popularItems,
         cart: initialCart,
@@ -149,6 +163,53 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
   clearCart: () => set({ cart: [] }),
 
+  // 🔹 general filter system
+  filterProducts: (filters) => {
+    const { originalProducts } = get();
+    let filtered = [...originalProducts];
+
+    if (!filters) {
+      set({ products: filtered });
+      return;
+    }
+
+    const { search, categories, minRating, priceRange, onlyDiscounted } =
+      filters;
+
+    if (search) {
+      const query = search.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.title.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query)
+      );
+    }
+
+    if (categories && categories.length > 0) {
+      filtered = filtered.filter((p) => categories.includes(p.category));
+    }
+
+    if (minRating) {
+      filtered = filtered.filter((p) => (p.rating?.rate ?? 0) >= minRating);
+    }
+
+    if (priceRange) {
+      const [min, max] = priceRange;
+      filtered = filtered.filter((p) => p.price >= min && p.price <= max);
+    }
+
+    if (onlyDiscounted) {
+      filtered = filtered.filter((p) => p.discountPercent);
+    }
+
+    set({ products: filtered });
+  },
+
+  resetFilters: () => {
+    const { originalProducts } = get();
+    set({ products: [...originalProducts] });
+  },
+
   getCartDetails: () => {
     const { cart, products } = get();
     return cart.map(({ id, count }) => {
@@ -177,7 +238,6 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
   totalCount: () => get().cart.reduce((acc, c) => acc + c.count, 0),
 
-  // 🆕 Summary calculation
   getSummary: () => {
     const { cart, products } = get();
 
@@ -201,7 +261,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
     const savings = originalPrice - discountedTotal;
     const storePickup = 140;
-    const tax = discountedTotal * 0.08; // 8% tax
+    const tax = discountedTotal * 0.08;
     const total = discountedTotal + storePickup + tax;
 
     return {
