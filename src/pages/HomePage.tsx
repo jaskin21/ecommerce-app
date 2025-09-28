@@ -2,69 +2,13 @@ import { motion } from 'framer-motion';
 import { FaStar } from 'react-icons/fa';
 import { useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
+
+import { testimonials, customerReviews } from '../data';
 import DiscountedItemCarousel from '../components/home/DiscountedItemCarousel';
 import PopularProduct from '../components/home/PopularProduct';
 import DiscountCountdown from '../components/home/DiscountCountdown';
 
 const HomePage = () => {
-  const testimonials = [
-    { text: '“A new industry standard.” - Entrepreneur' },
-    { text: "“Just what your OB-GYN ordered.” - Harper's Bazaar" },
-    { text: "“We're obsessed” - Glamour" },
-    { text: '“My favorite underwear ... ever” - Vogue' },
-  ];
-
-  const customerReviews = [
-    {
-      review:
-        "The softest, most breathable essentials I've ever worn—comfortable all day long!",
-      name: 'Rebecca B.',
-      status: 'Verified Customer',
-      product: 'Organic Cotton High-Rise Thong',
-      productLink: '#',
-    },
-    {
-      review:
-        'These are so much more comfortable and durable compared to other brands. Feels like you are wearing nothing.',
-      name: 'Allison G.',
-      status: 'Verified Customer',
-      product: 'Organic Cotton Low-Rise Thong',
-      productLink: '#',
-    },
-    {
-      review:
-        'Worth every penny! I love my JAS essentials — the mid-rise thong, bikini, and hipster. They stay put all day.',
-      name: 'Jennifer D.',
-      status: 'Verified Customer',
-      product: 'Organic Cotton Mid-Rise Bikini',
-      productLink: '#',
-    },
-    {
-      review:
-        'Super comfy and sustainable! I’ve switched all my basics to JAS Ecommerce.',
-      name: 'Michael T.',
-      status: 'Verified Customer',
-      product: 'Organic Cotton Crew Tee',
-      productLink: '#',
-    },
-    {
-      review:
-        'I was skeptical at first, but these are the only essentials I wear now. They last forever!',
-      name: 'Sophia R.',
-      status: 'Verified Customer',
-      product: 'Organic Cotton Bodysuit',
-      productLink: '#',
-    },
-    {
-      review:
-        "Quality is unmatched, and I love that it's eco-friendly. Highly recommend.",
-      name: 'David P.',
-      status: 'Verified Customer',
-      product: 'Organic Cotton Hoodie',
-      productLink: '#',
-    },
-  ];
-
   const [current, setCurrent] = useState(0);
   const reviewsPerSlide = 3; // Show 3 at a time
   const totalSlides = Math.ceil(customerReviews.length / reviewsPerSlide);

@@ -1,3 +1,5 @@
+import { contact } from '../data';
+
 const ContactPage = () => {
   return (
     <>
@@ -22,7 +24,7 @@ const ContactPage = () => {
                 href='mailto:hello@slothui.com'
                 className='text-indigo-600 hover:underline'
               >
-                hello@slothui.com
+                {contact.email}
               </a>
             </p>
             <form className='flex flex-col gap-4 flex-1'>
@@ -71,7 +73,7 @@ const ContactPage = () => {
                 href='mailto:hello@slothui.com'
                 className='text-indigo-600 hover:underline'
               >
-                hello@slothui.com
+                {contact.email}
               </a>
             </p>
           </div>
@@ -94,10 +96,10 @@ const ContactPage = () => {
                 Our team can respond in real time.
               </p>
               <a
-                href='mailto:hello@slothui.com'
+                href={`mailto:${contact.email}`}
                 className='text-indigo-600 hover:underline'
               >
-                hello@slothui.com
+                {contact.email}
               </a>
             </div>
 
@@ -117,7 +119,7 @@ const ContactPage = () => {
                 Visit our location in real life.
               </p>
               <a href='#' className='text-indigo-600 hover:underline'>
-                221b Elementary Avenue, NY
+                {contact.address}
               </a>
             </div>
 
@@ -137,10 +139,10 @@ const ContactPage = () => {
                 Available during working hours.
               </p>
               <a
-                href='tel:+12344567789'
+                href={`tel:${contact.phone}`}
                 className='text-indigo-600 hover:underline'
               >
-                (+1) 234 - 4567 - 789
+                {contact.phone}
               </a>
             </div>
           </div>

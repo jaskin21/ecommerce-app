@@ -1,13 +1,7 @@
 import { motion } from 'framer-motion';
+import { testimonials } from '../data';
 
 const AboutPage = () => {
-  const testimonials = [
-    { text: '“A new industry standard.” - Entrepreneur' },
-    { text: "“Just what your OB-GYN ordered.” - Harper's Bazaar" },
-    { text: "“We're obsessed” - Glamour" },
-    { text: '“My favorite underwear ... ever” - Vogue' },
-  ];
-
   return (
     <>
       {/* Tagline Section */}
