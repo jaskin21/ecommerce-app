@@ -7,7 +7,10 @@ import { BsCartPlus } from 'react-icons/bs';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { Product } from '../types/productTypes';
 import { useShopStore } from '../stores/useProductStore';
-import { dummyReviews } from '../data/customerReviews'; // ← your new array
+import { dummyReviews } from '../data/customerReviews';
+import useToast from '../hook/useToast';
+import { handleFetchBaseQueryError } from '../utils/errorFactory';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 type Review = {
   id: number;
@@ -23,12 +26,31 @@ const REVIEWS_PER_PAGE = 6;
 
 const ProductOverview = () => {
   const { productId } = useParams<{ productId: string }>();
-  const { products } = useShopStore();
+  const { products, addToCart } = useShopStore();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [productReviews, setProductReviews] = useState<Review[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterStars, setFilterStars] = useState<number | null>(null);
+
+  // new state for review image modal
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
+  const { showSuccessToast, showErrorToast } = useToast();
+
+  const handleAddToCart = (id: number) => {
+    try {
+      addToCart(id);
+      showSuccessToast('Added to cart successfully!');
+    } catch (error) {
+      const errorMessage = handleFetchBaseQueryError(
+        error as FetchBaseQueryError,
+        'Invalid IP Address!',
+        true
+      );
+      showErrorToast(`${errorMessage}`);
+    }
+  };
 
   // load product
   useEffect(() => {
@@ -156,7 +178,10 @@ const ProductOverview = () => {
           </p>
 
           {/* Add to Cart */}
-          <button className='flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition w-fit'>
+          <button
+            onClick={() => handleAddToCart(product.id)}
+            className='flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition w-fit'
+          >
             <BsCartPlus /> Add to Cart
           </button>
         </div>
@@ -213,7 +238,8 @@ const ProductOverview = () => {
                         key={i}
                         src={src}
                         alt='review'
-                        className='w-20 h-20 object-cover rounded'
+                        className='w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80'
+                        onClick={() => setSelectedPhoto(src)}
                       />
                     ))}
                   </div>
@@ -225,8 +251,8 @@ const ProductOverview = () => {
 
         {totalPages > 1 && (
           <div className='flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6 mt-6'>
+            {/* Mobile Prev/Next */}
             <div className='flex flex-1 justify-between sm:hidden'>
-              {/* Mobile Prev */}
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
@@ -238,8 +264,6 @@ const ProductOverview = () => {
               >
                 Previous
               </button>
-
-              {/* Mobile Next */}
               <button
                 onClick={() =>
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
@@ -257,7 +281,6 @@ const ProductOverview = () => {
 
             {/* Pagination */}
             <div className='flex flex-col items-center gap-4 sm:flex-row sm:justify-between sm:items-center'>
-              {/* Results Count */}
               <p className='text-sm text-gray-300'>
                 Showing{' '}
                 <span className='font-medium'>
@@ -270,13 +293,10 @@ const ProductOverview = () => {
                 of <span className='font-medium'>{totalPages * 10}</span>{' '}
                 results
               </p>
-
-              {/* Page Numbers */}
               <nav
                 aria-label='Pagination'
                 className='isolate inline-flex -space-x-px rounded-md'
               >
-                {/* Prev */}
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   disabled={currentPage === 1}
@@ -296,13 +316,10 @@ const ProductOverview = () => {
                     />
                   </svg>
                 </button>
-
-                {/* Dynamic Page Numbers (max 6 shown) */}
                 {(() => {
                   const pageNumbers = [];
                   let start = Math.max(1, currentPage - 2);
                   const end = Math.min(totalPages, start + 5);
-
                   if (end - start < 5) start = Math.max(1, end - 5);
 
                   for (let i = start; i <= end; i++) {
@@ -320,11 +337,8 @@ const ProductOverview = () => {
                       </button>
                     );
                   }
-
                   return pageNumbers;
                 })()}
-
-                {/* Next */}
                 <button
                   onClick={() =>
                     setCurrentPage((p) => Math.min(p + 1, totalPages))
@@ -351,6 +365,20 @@ const ProductOverview = () => {
           </div>
         )}
       </div>
+
+      {/* Modal for review photo */}
+      {selectedPhoto && (
+        <div
+          className='fixed inset-0 bg-black/70 flex items-center justify-center z-50'
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <img
+            src={selectedPhoto}
+            alt='enlarged review'
+            className='max-w-[90%] max-h-[90%] rounded shadow-lg'
+          />
+        </div>
+      )}
     </div>
   );
 };

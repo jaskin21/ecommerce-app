@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const PopularProduct = () => {
   const { popularItems, addToCart } = useShopStore();
   const { showSuccessToast, showErrorToast } = useToast();
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleAddToCart = (id: number) => {
     try {
@@ -62,7 +62,10 @@ const PopularProduct = () => {
           </div>
 
           {/* Product Title */}
-          <h3 className='font-medium text-gray-800 mb-2 line-clamp-2'>
+          <h3
+            onClick={() => navigate(`/shop/${product.id}`)}
+            className='font-medium text-gray-800 mb-2 line-clamp-2 cursor-pointer hover:underline'
+          >
             {product.title}
           </h3>
 

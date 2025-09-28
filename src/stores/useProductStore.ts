@@ -196,7 +196,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
     });
 
     const savings = originalPrice - discountedTotal;
-    const storePickup = 140;
+    const storePickup = 2;
     const tax = discountedTotal * 0.08;
     const total = discountedTotal + storePickup + tax;
 

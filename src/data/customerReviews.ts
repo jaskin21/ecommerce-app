@@ -1,5 +1,5 @@
 // Dummy reviews data (50)
-export const originalDummyReviews = [
+export const dummyReviews = [
   {
     id: 1,
     user: 'Anonymous',
@@ -457,7 +457,7 @@ export const originalDummyReviews = [
   },
 ];
 
-export const dummyReviews = originalDummyReviews.map((r) => ({
-  ...r,
-  productId: 2,
-}));
+// export const dummyReviews = originalDummyReviews.map((r) => ({
+//   ...r,
+//   productId: 2,
+// }));

@@ -2,9 +2,30 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useShopStore } from '../../stores/useProductStore';
+import { useNavigate } from 'react-router-dom';
+import { handleFetchBaseQueryError } from '../../utils/errorFactory';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import useToast from '../../hook/useToast';
 
 const ProductCarousel = () => {
-  const { discountedItems } = useShopStore();
+  const { discountedItems, addToCart } = useShopStore();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const navigate = useNavigate();
+
+  const handleAddToCart = (id: number) => {
+    try {
+      addToCart(id);
+      showSuccessToast('Added to cart successfully!');
+    } catch (error) {
+      const errorMessage = handleFetchBaseQueryError(
+        error as FetchBaseQueryError,
+        'Invalid IP Address!',
+        true
+      );
+
+      showErrorToast(`${errorMessage}`);
+    }
+  };
 
   const products = discountedItems || [];
   const [index, setIndex] = useState(0);
@@ -57,7 +78,10 @@ const ProductCarousel = () => {
 
             {/* Info */}
             <div className='flex-1 text-center md:text-left'>
-              <h3 className='font-semibold text-lg mb-2 line-clamp-2'>
+              <h3
+                onClick={() => navigate(`/shop/${product.id}`)}
+                className='font-semibold text-lg mb-2 line-clamp-2 cursor-pointer hover:underline'
+              >
                 {product.title}
               </h3>
               <div className='flex justify-center md:justify-start items-center gap-3 mb-2'>
@@ -71,7 +95,10 @@ const ProductCarousel = () => {
                   </span>
                 )}
               </div>
-              <button className='mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700'>
+              <button
+                onClick={() => handleAddToCart(product.id)}
+                className='mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700'
+              >
                 Add to Cart
               </button>
             </div>
